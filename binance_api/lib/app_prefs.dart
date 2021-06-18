@@ -1,9 +1,6 @@
-
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences {
-
   static late SharedPreferences _prefs;
 
   static Future<void> init() async {
@@ -15,5 +12,4 @@ class AppPreferences {
   }
 
   static int getTimeAdjustment() => _prefs.get('time_adj') as int? ?? 0;
-
 }
