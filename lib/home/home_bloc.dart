@@ -1,13 +1,30 @@
-import 'package:bloc/bloc.dart';
+import "package:bloc/bloc.dart";
 
 class HomeState {
-  HomeState({this.balance = 0.0, this.maxLoss = 0.0, this.entryPrice = 0.0, this.stopLoss = 0.0, this.entrySize = 0.0});
+  HomeState({this.balance = 1000,
+    this.maxLoss = 20,
+    this.entryPrice = 0.0,
+    this.stopLoss = 0.0,
+    this.entrySize = 0.0});
 
   final double balance;
   final double maxLoss;
   final double entryPrice;
   final double stopLoss;
   final double entrySize;
+
+  HomeState copyWith({double? balance,
+    double? maxLoss,
+    double? entryPrice,
+    double? stopLoss,
+    double? entrySize,}) =>
+      HomeState(
+        balance: balance ?? this.balance,
+        maxLoss: maxLoss ?? this.maxLoss,
+        entryPrice: entryPrice ?? this.entryPrice,
+        entrySize: entrySize ?? this.entrySize,
+        stopLoss: stopLoss ?? this.stopLoss,
+      );
 }
 
 abstract class HomeEvent {}
@@ -15,13 +32,13 @@ abstract class HomeEvent {}
 class OnStopLossSetEvent extends HomeEvent {
   OnStopLossSetEvent(this.stopLoss);
 
-  final double stopLoss;
+  final String stopLoss;
 }
 
 class OnEntryPriceSet extends HomeEvent {
   OnEntryPriceSet(this.entryPrice);
 
-  final double entryPrice;
+  final String entryPrice;
 }
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
@@ -29,7 +46,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
+
     if (event is OnStopLossSetEvent) {
-    } else if (event is OnEntryPriceSet) {}
+      emit(state.copyWith(stopLoss: _parseDouble(event.stopLoss)));
+    } else if (event is OnEntryPriceSet) {
+      emit(state.copyWith(entryPrice: _parseDouble(event.entryPrice)));
+    }
+
+    if (state.entryPrice != 0.0 && state.stopLoss != 0.0) {
+      final entrySize = state.maxLoss / (state.entryPrice - state.stopLoss);
+      emit(state.copyWith(entrySize: entrySize));
+    }
+  }
+
+  double _parseDouble(String value) {
+    return double.parse(value);
   }
 }
