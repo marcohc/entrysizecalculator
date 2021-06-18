@@ -11,9 +11,6 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:either_option/either_option.dart';
 
-const _apiKey = '';
-const _secret = '';
-
 const _baseUrl = 'https://api.binance.com';
 
 // Anonymous endpoints
@@ -28,7 +25,11 @@ const _accountInfo = '/api/v3/account';
 const _allOrders = '/api/v3/allOrders';
 
 class BinanceApi {
-  final client = ApiCallsManager(_apiKey);
+  BinanceApi({required this.apiKey, required this.secret}) : client = ApiCallsManager(apiKey);
+
+  final String apiKey;
+  final String secret;
+  final ApiCallsManager client;
 
 //region Anonymous endpoints
 
@@ -68,8 +69,7 @@ class BinanceApi {
         (result) => AccountInfo.fromJson(result),
       );
 
-  Future<Either<ErrorModel, List<Order>>> getAllOrders({String symbol = 'ETHBTC'}) =>
-      executeSafely<Map<String, dynamic>, List<Order>>(
+  Future<Either<ErrorModel, List<Order>>> getAllOrders({String symbol = 'ETHBTC'}) => executeSafely<Map<String, dynamic>, List<Order>>(
         'getAllOrders',
         _executeTimeAdjusted(_allOrders, 'symbol=$symbol'),
         (result) {
@@ -113,7 +113,7 @@ class BinanceApi {
     print(timestamp);
     final queryWithTimeStamp = query + '&' + timestamp;
 
-    final key = utf8.encode(_secret);
+    final key = utf8.encode(secret);
     final bytes = utf8.encode(queryWithTimeStamp);
 
     final hmacSha256 = Hmac(sha256, key);
