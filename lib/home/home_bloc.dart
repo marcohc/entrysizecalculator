@@ -1,11 +1,12 @@
 import "package:bloc/bloc.dart";
 
 class HomeState {
-  HomeState({this.balance = 1000,
-    this.maxLoss = 20,
-    this.entryPrice = 0.0,
-    this.stopLoss = 0.0,
-    this.entrySize = 0.0});
+  HomeState(
+      {this.balance = 1000,
+      this.maxLoss = 20,
+      this.entryPrice = 0.0,
+      this.stopLoss = 0.0,
+      this.entrySize = 0.0});
 
   final double balance;
   final double maxLoss;
@@ -13,11 +14,13 @@ class HomeState {
   final double stopLoss;
   final double entrySize;
 
-  HomeState copyWith({double? balance,
+  HomeState copyWith({
+    double? balance,
     double? maxLoss,
     double? entryPrice,
     double? stopLoss,
-    double? entrySize,}) =>
+    double? entrySize,
+  }) =>
       HomeState(
         balance: balance ?? this.balance,
         maxLoss: maxLoss ?? this.maxLoss,
@@ -41,6 +44,8 @@ class OnEntryPriceSet extends HomeEvent {
   final String entryPrice;
 }
 
+class OnSettingsClickEvent extends HomeEvent {}
+
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeState());
 
@@ -49,10 +54,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     if (event is OnStopLossSetEvent) {
       emit(state.copyWith(stopLoss: _parseDouble(event.stopLoss)));
+      updateEntrySize();
     } else if (event is OnEntryPriceSet) {
       emit(state.copyWith(entryPrice: _parseDouble(event.entryPrice)));
+      updateEntrySize();
+    } else if (event is OnSettingsClickEvent) {
+      // TODO: Navigate to Settings
     }
 
+  }
+
+  void updateEntrySize() {
     if (state.entryPrice != 0.0 && state.stopLoss != 0.0) {
       final entrySize = state.maxLoss / (state.entryPrice - state.stopLoss);
       emit(state.copyWith(entrySize: entrySize));

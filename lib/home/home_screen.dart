@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tilda/home/home_bloc.dart';
+import 'package:tilda/settings/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -13,15 +14,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _bloc = HomeBloc();
 
-  final _entryPriceController = TextEditingController();
   final _stopLossController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _entryPriceController.addListener(() {
-      _bloc.add(OnEntryPriceSet(_entryPriceController.text));
-    });
 
     _stopLossController.addListener(() {
       _bloc.add(OnStopLossSetEvent(_stopLossController.text));
@@ -33,6 +30,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Home"),
+        actions: [
+          Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => SettingsScreen()));
+                },
+                child: Icon(Icons.more_vert),
+              ))
+        ],
       ),
       body: BlocBuilder<HomeBloc, HomeState>(
           bloc: _bloc,
@@ -48,13 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Max loss: " + state.maxLoss.toString(),
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
-                TextField(
-                  decoration: InputDecoration(labelText: "Entry price"),
+                TextInputWidget(
+                  labelText: "Entry price",
                   keyboardType: TextInputType.number,
-                  // inputFormatters: [
-                  //   FilteringTextInputFormatter(r'(^\d*\.?\d*)', allow: false)
-                  // ],
-                  controller: _entryPriceController,
+                  onTextChanged: (text) => _bloc.add(OnEntryPriceSet(text)),
                 ),
                 TextField(
                   decoration: InputDecoration(labelText: "Stop loss"),
@@ -73,6 +78,43 @@ class _HomeScreenState extends State<HomeScreen> {
               ]),
             );
           }),
+    );
+  }
+}
+
+// TODO: Research better way to pass text function
+class TextInputWidget extends StatefulWidget {
+  const TextInputWidget({
+    required this.labelText,
+    required this.keyboardType,
+    required this.onTextChanged,
+  });
+
+  final String labelText;
+  final TextInputType keyboardType;
+  final Function(String) onTextChanged;
+
+  @override
+  _TextInputWidgetState createState() => _TextInputWidgetState();
+}
+
+class _TextInputWidgetState extends State<TextInputWidget> {
+  final _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController.addListener(() {
+      widget.onTextChanged(_textEditingController.text);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(labelText: widget.labelText),
+      keyboardType: widget.keyboardType,
+      controller: _textEditingController,
     );
   }
 }
