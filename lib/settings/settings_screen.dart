@@ -22,11 +22,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
 
     _riskController.addListener(() {
-      // _bloc.add(OnStopLossSetEvent(_binanceApiKeyController.text));
+      _bloc.add(OnRiskApiKey(_binanceApiKeyController.text));
     });
 
     _binanceApiKeyController.addListener(() {
-      // _bloc.add(OnStopLossSetEvent(_binanceApiKeyController.text));
+      _bloc.add(OnBinanceApiKey(_binanceApiKeyController.text));
     });
   }
 
@@ -49,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 TextField(
                   decoration: InputDecoration(labelText: "Binance API key:"),
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.text,
                   controller: _binanceApiKeyController,
                 ),
               ]),
