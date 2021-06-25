@@ -1,4 +1,6 @@
 import "package:bloc/bloc.dart";
+import 'package:get_it/get_it.dart';
+import 'package:tilda/common/app_navigator.dart';
 
 class HomeState {
   HomeState(
@@ -49,6 +51,8 @@ class OnSettingsClickEvent extends HomeEvent {}
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeState());
 
+  final _navigator = GetIt.instance.get<AppNavigator>();
+
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
 
@@ -59,7 +63,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(entryPrice: _parseDouble(event.entryPrice)));
       updateEntrySize();
     } else if (event is OnSettingsClickEvent) {
-      // TODO: Navigate to Settings
+      _navigator.showSettingsScreen();
     }
 
   }

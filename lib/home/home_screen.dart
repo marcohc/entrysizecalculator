@@ -34,10 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) => SettingsScreen()));
-                },
+                onTap: () => _bloc.add(OnSettingsClickEvent()),
                 child: Icon(Icons.more_vert),
               ))
         ],
