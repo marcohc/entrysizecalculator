@@ -1,21 +1,26 @@
 import "package:bloc/bloc.dart";
-import "package:shared_preferences/shared_preferences.dart";
+import 'package:get_it/get_it.dart';
+import 'package:tilda/common/app_prefs.dart';
 
 class SettingsState {
   SettingsState({
     this.binanceApiKey = "",
+    this.binanceSecret = "",
     this.risk = 0.0,
   });
 
   final String binanceApiKey;
+  final String binanceSecret;
   final double risk;
 
   SettingsState copyWith({
     String? binanceApiKey,
+    String? binanceSecret,
     double? risk,
   }) =>
       SettingsState(
         binanceApiKey: binanceApiKey ?? this.binanceApiKey,
+        binanceSecret: binanceSecret ?? this.binanceSecret,
         risk: risk ?? this.risk,
       );
 }
@@ -26,6 +31,12 @@ class InitEvent extends SettingsEvent {}
 
 class OnBinanceApiKey extends SettingsEvent {
   OnBinanceApiKey(this.text);
+
+  final String text;
+}
+
+class OnBinanceSecret extends SettingsEvent {
+  OnBinanceSecret(this.text);
 
   final String text;
 }
@@ -41,36 +52,25 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     add(InitEvent());
   }
 
+  final appPrefs = GetIt.instance.get<AppPrefs>();
+
   @override
   Stream<SettingsState> mapEventToState(SettingsEvent event) async* {
     if (event is InitEvent) {
       emit(state.copyWith(
-        binanceApiKey: await _getBinanceApiKey(),
-        risk: await _getRisk(),
+        binanceApiKey: appPrefs.getBinanceApiKey(),
+        binanceSecret: appPrefs.getBinanceSecret(),
+        risk: appPrefs.getRisk(),
       ));
     } else if (event is OnBinanceApiKey) {
-      _setBinanceApiKey(event.text);
+      appPrefs.storeBinanceApiKey(event.text);
+    } else if (event is OnBinanceSecret) {
+      appPrefs.storeBinanceSecret(event.text);
     } else if (event is OnRiskApiKey) {
-      _setRisk(double.parse(event.text));
+      double? risk = double.tryParse(event.text);
+      if (risk != null) {
+        appPrefs.storeRisk(risk);
+      }
     }
   }
-
-  Future<String?> _getBinanceApiKey() async {
-    return (await getSharedPreferences()).getString("binanceApiKey");
-  }
-
-  Future<double?> _getRisk() async {
-    return (await getSharedPreferences()).getDouble("risk");
-  }
-
-  void _setBinanceApiKey(String text) async {
-    (await getSharedPreferences()).setString('binanceApiKey', text);
-  }
-
-  void _setRisk(double value) async {
-    (await getSharedPreferences()).setDouble('risk', value);
-  }
-
-  Future<SharedPreferences> getSharedPreferences() async =>
-      await SharedPreferences.getInstance();
 }

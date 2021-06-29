@@ -10,6 +10,8 @@ import 'package:tilda/settings/settings_screen.dart';
 void main() async {
   await runZonedGuarded(
     () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
       await DiModule.setup();
       runApp(MyApp());
     },

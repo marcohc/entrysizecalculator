@@ -3,12 +3,13 @@ import 'package:get_it/get_it.dart';
 import 'package:tilda/common/app_navigator.dart';
 
 class HomeState {
-  HomeState(
-      {this.balance = 1000,
-      this.maxLoss = 20,
-      this.entryPrice = 0.0,
-      this.stopLoss = 0.0,
-      this.entrySize = 0.0});
+  HomeState({
+    this.balance = 1000,
+    this.maxLoss = 20,
+    this.entryPrice = 0.0,
+    this.stopLoss = 0.0,
+    this.entrySize = 0.0,
+  });
 
   final double balance;
   final double maxLoss;
@@ -55,7 +56,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
-
     if (event is OnStopLossSetEvent) {
       emit(state.copyWith(stopLoss: _parseDouble(event.stopLoss)));
       updateEntrySize();
@@ -65,7 +65,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } else if (event is OnSettingsClickEvent) {
       _navigator.showSettingsScreen();
     }
-
   }
 
   void updateEntrySize() {

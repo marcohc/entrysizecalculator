@@ -14,21 +14,18 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _bloc = SettingsBloc();
 
-  final _riskController = TextEditingController();
-  final _binanceApiKeyController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _riskController.addListener(() {
-      _bloc.add(OnRiskApiKey(_binanceApiKeyController.text));
+  late final _riskController = TextEditingController()
+    ..addListener(() {
+      _bloc.add(OnRiskApiKey(_riskController.text));
     });
-
-    _binanceApiKeyController.addListener(() {
+  late final _binanceApiKeyController = TextEditingController()
+    ..addListener(() {
       _bloc.add(OnBinanceApiKey(_binanceApiKeyController.text));
     });
-  }
+  late final _binanceSecretController = TextEditingController()
+    ..addListener(() {
+      _bloc.add(OnBinanceSecret(_binanceSecretController.text));
+    });
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +34,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text("Settings"),
       ),
       body: BlocBuilder<SettingsBloc, SettingsState>(
-          bloc: _bloc,
-          builder: (context, state) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(children: [
+        bloc: _bloc,
+        builder: (context, state) {
+
+          _riskController.text = state.risk.toString();
+          _binanceApiKeyController.text = state.binanceApiKey;
+          _binanceSecretController.text = state.binanceSecret;
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
                 TextField(
                   decoration: InputDecoration(labelText: "Risk tolerance:"),
                   keyboardType: TextInputType.number,
@@ -52,9 +55,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   keyboardType: TextInputType.text,
                   controller: _binanceApiKeyController,
                 ),
-              ]),
-            );
-          }),
+                TextField(
+                  decoration: InputDecoration(labelText: "Binance Secret:"),
+                  keyboardType: TextInputType.text,
+                  controller: _binanceSecretController,
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

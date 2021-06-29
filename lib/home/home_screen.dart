@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
                 onTap: () => _bloc.add(OnSettingsClickEvent()),
-                child: Icon(Icons.more_vert),
+                child: Icon(Icons.settings),
               ))
         ],
       ),
