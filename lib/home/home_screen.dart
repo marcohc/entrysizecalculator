@@ -53,6 +53,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Max loss: " + state.maxLoss.toString(),
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                    child: OutlinedButton(
+                        onPressed: () => _bloc.add(OnBaseCurrencyPairClick()),
+                        child: Text(
+                          state.baseCurrencyPair.toString(),
+                          style: Theme.of(context).textTheme.headline5,
+                        )),
+                  ),
+                ),
                 TextInputWidget(
                   labelText: "Entry price",
                   keyboardType: TextInputType.number,

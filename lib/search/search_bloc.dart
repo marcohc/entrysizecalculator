@@ -2,14 +2,13 @@ import "package:bloc/bloc.dart";
 import 'package:get_it/get_it.dart';
 import 'package:tilda/common/app_navigator.dart';
 
-class HomeState {
-  HomeState({
+class SearchState {
+  SearchState({
     this.balance = 1000,
     this.maxLoss = 20,
     this.entryPrice = 0.0,
     this.stopLoss = 0.0,
     this.entrySize = 0.0,
-    this.baseCurrencyPair = "Select currency pair",
   });
 
   final double balance;
@@ -17,51 +16,46 @@ class HomeState {
   final double entryPrice;
   final double stopLoss;
   final double entrySize;
-  final String baseCurrencyPair;
 
-  HomeState copyWith({
+  SearchState copyWith({
     double? balance,
     double? maxLoss,
     double? entryPrice,
     double? stopLoss,
     double? entrySize,
-    String? baseCurrencyPair,
   }) =>
-      HomeState(
+      SearchState(
         balance: balance ?? this.balance,
         maxLoss: maxLoss ?? this.maxLoss,
         entryPrice: entryPrice ?? this.entryPrice,
         entrySize: entrySize ?? this.entrySize,
         stopLoss: stopLoss ?? this.stopLoss,
-        baseCurrencyPair: baseCurrencyPair ?? this.baseCurrencyPair,
       );
 }
 
-abstract class HomeEvent {}
+abstract class SearchEvent {}
 
-class OnStopLossSetEvent extends HomeEvent {
+class OnStopLossSetEvent extends SearchEvent {
   OnStopLossSetEvent(this.stopLoss);
 
   final String stopLoss;
 }
 
-class OnEntryPriceSet extends HomeEvent {
+class OnEntryPriceSet extends SearchEvent {
   OnEntryPriceSet(this.entryPrice);
 
   final String entryPrice;
 }
 
-class OnSettingsClickEvent extends HomeEvent {}
+class OnSettingsClickEvent extends SearchEvent {}
 
-class OnBaseCurrencyPairClick extends HomeEvent {}
-
-class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc() : super(HomeState());
+class SearchBloc extends Bloc<SearchEvent, SearchState> {
+  SearchBloc() : super(SearchState());
 
   final _navigator = GetIt.instance.get<AppNavigator>();
 
   @override
-  Stream<HomeState> mapEventToState(HomeEvent event) async* {
+  Stream<SearchState> mapEventToState(SearchEvent event) async* {
     if (event is OnStopLossSetEvent) {
       emit(state.copyWith(stopLoss: _parseDouble(event.stopLoss)));
       updateEntrySize();
@@ -70,8 +64,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       updateEntrySize();
     } else if (event is OnSettingsClickEvent) {
       _navigator.showSettingsScreen();
-    } else if (event is OnBaseCurrencyPairClick) {
-      _navigator.showCurrencyPairSearchScreen();
     }
   }
 
