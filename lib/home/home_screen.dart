@@ -84,6 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+                OutlinedButton(
+                  onPressed: () => _bloc.add(TestBinance()),
+                  child: Text('Test binance'),
+                )
               ]),
             );
           }),

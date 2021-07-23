@@ -25,7 +25,9 @@ const _accountInfo = '/api/v3/account';
 const _allOrders = '/api/v3/allOrders';
 
 class BinanceApi {
-  BinanceApi({required this.apiKey, required this.secret}) : client = ApiCallsManager(apiKey);
+  BinanceApi({required this.apiKey, required this.secret}) : client = ApiCallsManager(apiKey) {
+    AppPreferences.init();
+  }
 
   final String apiKey;
   final String secret;
