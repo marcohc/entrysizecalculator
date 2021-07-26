@@ -81,6 +81,8 @@ class BinanceApi {
         },
       );
 
+  Future<Either<ErrorModel, List<dynamic>>> getAllPairs({String symbol = 'BTC'}) async => Right(<dynamic>[]);
+
 //endregion
 
 //region helper methods

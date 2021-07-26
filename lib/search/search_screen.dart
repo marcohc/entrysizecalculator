@@ -21,40 +21,45 @@ class _SearchScreenState extends State<SearchScreen> {
       body: BlocBuilder<SearchBloc, SearchState>(
         bloc: _bloc,
         builder: (context, state) {
-          if (state.items == null) {
-            return Container(
-              child: Center(
-                child: Text("Pull to refresh to get data."),
-              ),
-            );
-          } else {
-            return RefreshIndicator(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: state.items!.length,
-                      itemBuilder: (context, index) {
-                        final item = state.items![index];
-                        return InkWell(
-                          onTap: () {
-                            _bloc.add(OnItemClickEvent(item));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(item.name),
+          return RefreshIndicator(
+            child: state.items == null
+                ? Container(
+                    child: ListView(
+                      children: [
+                        Center(
+                          child: Text(
+                            "Pull to refresh to get data.",
+                            textAlign: TextAlign.center,
                           ),
-                        );
-                      },
+                        )
+                      ],
                     ),
+                  )
+                : Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.items!.length,
+                          itemBuilder: (context, index) {
+                            final item = state.items![index];
+                            return InkWell(
+                              onTap: () {
+                                _bloc.add(OnItemClickEvent(item));
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(item.name),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              onRefresh: () async {
-                _bloc.add(OnPullToRefreshEvent());
-              },
-            );
-          }
+            onRefresh: () async {
+              _bloc.add(OnPullToRefreshEvent());
+            },
+          );
         },
       ),
     );
