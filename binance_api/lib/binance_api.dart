@@ -81,6 +81,7 @@ class BinanceApi {
         },
       );
 
+  // TODO: Implement for CurrencyPairs screen
   Future<Either<ErrorModel, List<dynamic>>> getAllPairs({String symbol = 'BTC'}) async => Right(<dynamic>[]);
 
 //endregion
@@ -92,7 +93,7 @@ class BinanceApi {
 
   Future<Map<String, dynamic>> _executeTimeAdjusted(String endPoint, [String query = '']) async {
     try {
-      final signedQuery = _sighQuery(endPoint, query);
+      final signedQuery = _signQuery(endPoint, query);
       final response = await client.getRaw(signedQuery);
       return (response as Response).data;
     } on DioError catch (error) {
@@ -110,7 +111,7 @@ class BinanceApi {
     return _executeTimeAdjusted(endPoint, query);
   }
 
-  String _sighQuery(String endPoint, [String query = '']) {
+  String _signQuery(String endPoint, [String query = '']) {
     final timeAdjustment = AppPreferences.getTimeAdjustment();
     final dateTime = DateTime.now().subtract(Duration(milliseconds: timeAdjustment));
     final timestamp = "timestamp=" + dateTime.millisecondsSinceEpoch.toString();

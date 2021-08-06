@@ -1,15 +1,26 @@
 import 'package:binance_api/binance_api.dart';
+import 'package:binance_api/model/account_info.dart';
 import "package:bloc/bloc.dart";
 import 'package:get_it/get_it.dart';
 import 'package:tilda/common/app_navigator.dart';
+import 'package:either_option/either_option.dart';
 
 class BalancesState {
-  BalancesState({this.items});
+  BalancesState({this.loading = true, this.error = true, this.items});
 
+  final bool loading;
+  final bool error;
   final List<BalancesItem>? items;
 
-  BalancesState copyWith({List<BalancesItem>? items}) =>
-      BalancesState(items: items ?? this.items);
+  BalancesState copyWith(
+          {bool loading = true,
+          bool error = true,
+          List<BalancesItem>? items}) =>
+      BalancesState(
+        loading: loading,
+        error: error,
+        items: items ?? this.items,
+      );
 }
 
 abstract class BalancesEvent {}
@@ -39,7 +50,28 @@ class BalancesBloc extends Bloc<BalancesEvent, BalancesState> {
   @override
   Stream<BalancesState> mapEventToState(BalancesEvent event) async* {
     if (event is InitEvent) {
-      _binanceApi.getAllPairs();
+      emit(state.copyWith(loading: true));
+      final result = await _binanceApi.getAccountInfo();
+      // final result = Right(AccountInfo(
+      //     makerCommission: 0,
+      //     takerCommission: 0,
+      //     buyerCommission: 0,
+      //     sellerCommission: 0,
+      //     canTrade: true,
+      //     canWithdraw: true,
+      //     canDeposit: true,
+      //     updateTime: 0,
+      //     accountType: "",
+      //     balances: [Balance(asset: "ETH", free: "0.085", locked: "0.005")]));
+      result.fold((error) {
+        emit(state.copyWith(loading: false, error: true));
+      }, (accountInfo) {
+        final items = accountInfo.balances
+            .map((balance) =>
+                BalancesItem(balance.asset, balance.total.toString()))
+            .toList();
+        emit(state.copyWith(loading: false, items: items));
+      });
     } else if (event is OnItemClickEvent) {
       _navigator.pop(event.item);
     } else if (event is OnPullToRefreshEvent) {
@@ -50,6 +82,7 @@ class BalancesBloc extends Bloc<BalancesEvent, BalancesState> {
 
 class BalancesItem {
   final String name;
+  final String balance;
 
-  BalancesItem(this.name);
+  BalancesItem(this.name, this.balance);
 }

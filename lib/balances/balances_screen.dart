@@ -21,45 +21,59 @@ class _BalancesScreenState extends State<BalancesScreen> {
       body: BlocBuilder<BalancesBloc, BalancesState>(
         bloc: _bloc,
         builder: (context, state) {
-          return RefreshIndicator(
-            child: state.items == null
-                ? Container(
-                    child: ListView(
+          if (state.loading) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return RefreshIndicator(
+              child: state.items == null
+                  ? Container(
+                      child: ListView(
+                        children: [
+                          Center(
+                            child: Text(
+                              "Pull to refresh to get data.",
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : Column(
                       children: [
-                        Center(
-                          child: Text(
-                            "Pull to refresh to get data.",
-                            textAlign: TextAlign.center,
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: state.items!.length,
+                            itemBuilder: (context, index) {
+                              final item = state.items![index];
+                              return InkWell(
+                                onTap: () {
+                                  _bloc.add(OnItemClickEvent(item));
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(child: Text(item.name)),
+                                          Text(item.balance)
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        )
+                        ),
                       ],
                     ),
-                  )
-                : Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.items!.length,
-                          itemBuilder: (context, index) {
-                            final item = state.items![index];
-                            return InkWell(
-                              onTap: () {
-                                _bloc.add(OnItemClickEvent(item));
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(item.name),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-            onRefresh: () async {
-              _bloc.add(OnPullToRefreshEvent());
-            },
-          );
+              onRefresh: () async {
+                _bloc.add(OnPullToRefreshEvent());
+              },
+            );
+          }
         },
       ),
     );
