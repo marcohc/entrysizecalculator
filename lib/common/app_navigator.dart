@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 class AppNavigator {
   static const String home = '/';
   static const String settings = '/settings';
-  static const String search = '/search';
+  static const String balances = '/balances';
 
   final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -19,7 +19,7 @@ class AppNavigator {
     _navigator.pushNamed(AppNavigator.settings);
   }
 
-  void showCurrencyPairSearchScreen() {
-    _navigator.pushNamed(AppNavigator.search);
+  void showBalancesScreen() {
+    _navigator.pushNamed(AppNavigator.balances);
   }
 }

@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:tilda/common/app_navigator.dart';
 import 'package:tilda/common/di.dart';
 import 'package:tilda/home/home_screen.dart';
-import 'package:tilda/search/search_screen.dart';
+import 'package:tilda/balances/balances_screen.dart';
 import 'package:tilda/settings/settings_screen.dart';
 
 void main() async {
@@ -47,9 +47,9 @@ class MyApp extends StatelessWidget {
           builder: (context) => SettingsScreen(),
           settings: settings,
         );
-      case AppNavigator.search:
+      case AppNavigator.balances:
         return MaterialPageRoute<void>(
-          builder: (context) => SearchScreen(),
+          builder: (context) => BalancesScreen(),
           settings: settings,
         );
     }

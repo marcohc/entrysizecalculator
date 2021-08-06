@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tilda/search/search_bloc.dart';
+import 'package:tilda/balances/balances_bloc.dart';
 
-class SearchScreen extends StatefulWidget {
-  SearchScreen({Key? key}) : super(key: key);
+class BalancesScreen extends StatefulWidget {
+  BalancesScreen({Key? key}) : super(key: key);
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  _BalancesScreenState createState() => _BalancesScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
-  final _bloc = SearchBloc();
+class _BalancesScreenState extends State<BalancesScreen> {
+  final _bloc = BalancesBloc();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Search"),
+        title: Text("Balances"),
       ),
-      body: BlocBuilder<SearchBloc, SearchState>(
+      body: BlocBuilder<BalancesBloc, BalancesState>(
         bloc: _bloc,
         builder: (context, state) {
           return RefreshIndicator(

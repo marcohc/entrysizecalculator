@@ -74,7 +74,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } else if (event is OnSettingsClickEvent) {
       _navigator.showSettingsScreen();
     } else if (event is OnBaseCurrencyPairClick) {
-      _navigator.showCurrencyPairSearchScreen();
+      _navigator.showBalancesScreen();
     } else if (event is TestBinance) {
       GetIt.instance.get<BinanceApi>().getAccountSnapshot();
     }

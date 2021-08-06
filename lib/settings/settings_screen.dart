@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tilda/home/home_bloc.dart';
 import 'package:tilda/settings/settings_bloc.dart';
 
 class SettingsScreen extends StatefulWidget {
