@@ -5,6 +5,7 @@ import 'package:binance_api/app_prefs.dart';
 import 'package:binance_api/model/account_info.dart';
 import 'package:binance_api/model/error.dart';
 import 'package:binance_api/model/order.dart';
+import 'package:binance_api/model/place_order.dart';
 import 'package:binance_api/model/snapshot.dart';
 import 'package:binance_api/utils/api_utils.dart';
 import 'package:crypto/crypto.dart';
@@ -23,6 +24,9 @@ const _accountSnapshot = '/sapi/v1/accountSnapshot';
 
 const _accountInfo = '/api/v3/account';
 const _allOrders = '/api/v3/allOrders';
+const _endpointOrderTest = '/api/v3/order/test'; //api/v3/order/test
+
+enum Method { POST, GET, DELETE }
 
 class BinanceApi {
   BinanceApi({required this.apiKey, required this.secret}) : client = ApiCallsManager(apiKey) {
@@ -53,11 +57,11 @@ class BinanceApi {
 //endregion
 
 //region Sign endpoints
-//
+
   Future<Either<ErrorModel, List<Snapshot>>> getAccountSnapshot({String type = 'SPOT'}) =>
       executeSafely<Map<String, dynamic>, List<Snapshot>>(
         'getAccountSnapshot',
-        _executeTimeAdjusted(_accountSnapshot, 'type=$type'),
+        _executeTimeAdjusted(_accountSnapshot, query: {'type': type}),
         (result) {
           final jsonList = result['snapshotVos'] as List<Map<String, dynamic>>;
           final snapshots = jsonList.map((element) => Snapshot.fromJson(element));
@@ -73,7 +77,7 @@ class BinanceApi {
 
   Future<Either<ErrorModel, List<Order>>> getAllOrders({String symbol = 'ETHBTC'}) => executeSafely<Map<String, dynamic>, List<Order>>(
         'getAllOrders',
-        _executeTimeAdjusted(_allOrders, 'symbol=$symbol'),
+        _executeTimeAdjusted(_allOrders, query: {'symbol': symbol}),
         (result) {
           final list = result as List<Map<String, dynamic>>;
           final mapped = list.map((element) => Order.fromJson(element));
@@ -84,6 +88,16 @@ class BinanceApi {
   // TODO: Implement for CurrencyPairs screen
   Future<Either<ErrorModel, List<dynamic>>> getAllPairs({String symbol = 'BTC'}) async => Right(<dynamic>[]);
 
+  Future<Either<ErrorModel, Order>> placeTestOrder(PlaceOrder order) => executeSafely<Map<String, dynamic>, Order>(
+        'placeTestOrder',
+        _executeTimeAdjusted(
+          _endpointOrderTest,
+          query: order.toJson(),
+          method: Method.POST,
+        ),
+        (result) => Order.fromJson(result),
+      );
+
 //endregion
 
 //region helper methods
@@ -91,10 +105,23 @@ class BinanceApi {
   Future<dynamic> _getCall(String endPoint, [String query = '']) async =>
       await client.getJson('$_baseUrl$endPoint${query.isEmpty ? '' : '&$query'}');
 
-  Future<Map<String, dynamic>> _executeTimeAdjusted(String endPoint, [String query = '']) async {
+  Future<Map<String, dynamic>> _executeTimeAdjusted(String endPoint, {Map<String, dynamic>? query, Method method = Method.GET}) async {
     try {
-      final signedQuery = _signQuery(endPoint, query);
-      final response = await client.getRaw(signedQuery);
+      final signedQuery = _sighQuery(endPoint, query ?? {});
+
+      var response;
+      switch (method) {
+        case Method.POST:
+          response = await client.postRaw(signedQuery);
+          break;
+        case Method.GET:
+          response = await client.getRaw(signedQuery);
+          break;
+        case Method.DELETE:
+          response = await client.deleteRaw(signedQuery);
+          break;
+      }
+
       return (response as Response).data;
     } on DioError catch (error) {
       if ((error.response?.data as Map<String, dynamic>?)?['code'] == -1021) {
@@ -108,15 +135,16 @@ class BinanceApi {
       }
     }
 
-    return _executeTimeAdjusted(endPoint, query);
+    return _executeTimeAdjusted(endPoint, query: query);
   }
 
-  String _signQuery(String endPoint, [String query = '']) {
+  String _sighQuery(String endPoint, Map<String, dynamic> query) {
     final timeAdjustment = AppPreferences.getTimeAdjustment();
     final dateTime = DateTime.now().subtract(Duration(milliseconds: timeAdjustment));
     final timestamp = "timestamp=" + dateTime.millisecondsSinceEpoch.toString();
     print(timestamp);
-    final queryWithTimeStamp = query + '&' + timestamp;
+    final queryWithTimeStamp =
+        query.keys.where((key) => query[key] != null).fold('', (previousValue, key) => '$previousValue$key=${query[key]}&') + timestamp;
 
     final key = utf8.encode(secret);
     final bytes = utf8.encode(queryWithTimeStamp);

@@ -1,4 +1,5 @@
 import 'package:binance_api/binance_api.dart';
+import 'package:binance_api/model/place_order.dart';
 import "package:bloc/bloc.dart";
 import 'package:get_it/get_it.dart';
 import 'package:tilda/common/app_navigator.dart';
@@ -40,7 +41,9 @@ class HomeState {
 
 abstract class HomeEvent {}
 
-class TestBinance extends HomeEvent {}
+class GetBalances extends HomeEvent {}
+
+class PlaceTestOrder extends HomeEvent {}
 
 class OnStopLossSetEvent extends HomeEvent {
   OnStopLossSetEvent(this.stopLoss);
@@ -75,8 +78,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       _navigator.showSettingsScreen();
     } else if (event is OnBaseCurrencyPairClick) {
       _navigator.showBalancesScreen();
-    } else if (event is TestBinance) {
-      GetIt.instance.get<BinanceApi>().getAccountSnapshot();
+    } else if (event is GetBalances) {
+      await GetIt.instance.get<BinanceApi>().getAccountSnapshot();
+    } else if (event is PlaceTestOrder) {
+      await GetIt.instance.get<BinanceApi>().placeTestOrder(PlaceOrder.marketBuy('ETHBTC', quantity: 0.01));
     }
   }
 
