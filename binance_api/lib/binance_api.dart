@@ -24,6 +24,7 @@ const _accountSnapshot = '/sapi/v1/accountSnapshot';
 
 const _accountInfo = '/api/v3/account';
 const _allOrders = '/api/v3/allOrders';
+const _openOrders = '/api/v3/openOrders';
 const _endpointOrderTest = '/api/v3/order/test'; //api/v3/order/test
 
 enum Method { POST, GET, DELETE }
@@ -84,6 +85,16 @@ class BinanceApi {
           return mapped.toList();
         },
       );
+
+  Future<Either<ErrorModel, List<Order>>> getOpenOrders({String symbol = 'ETHBTC'}) => executeSafely<Map<String, dynamic>, List<Order>>(
+    'getOpenOrders',
+    _executeTimeAdjusted(_openOrders, query: {'symbol': symbol}),
+        (result) {
+      final list = result as List<Map<String, dynamic>>;
+      final mapped = list.map((element) => Order.fromJson(element));
+      return mapped.toList();
+    },
+  );
 
   // TODO: Implement for CurrencyPairs screen
   Future<Either<ErrorModel, List<dynamic>>> getAllPairs({String symbol = 'BTC'}) async => Right(<dynamic>[]);
