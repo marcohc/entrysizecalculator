@@ -6,6 +6,7 @@ import 'package:tilda/common/app_navigator.dart';
 import 'package:tilda/common/di.dart';
 import 'package:tilda/home/home_screen.dart';
 import 'package:tilda/balances/balances_screen.dart';
+import 'package:tilda/new_order/new_order_screen.dart';
 import 'package:tilda/pairs/pairs_screen.dart';
 import 'package:tilda/settings/settings_screen.dart';
 
@@ -62,7 +63,7 @@ class MyApp extends StatelessWidget {
         );
       case AppNavigator.newOrder:
         return MaterialPageRoute<void>(
-          builder: (context) => BalancesScreen(),
+          builder: (context) => NewOrderScreen(pair: settings.arguments as String),
           settings: settings,
         );
     }

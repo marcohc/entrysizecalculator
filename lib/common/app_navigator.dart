@@ -24,11 +24,11 @@ class AppNavigator {
   Future<String?> showBalancesScreen() async => (await _navigator.pushNamed(AppNavigator.balances)) as String?;
 
   Future<String?> showPairsScreen(String symbol) async {
-    var result = await _navigator.pushNamed(AppNavigator.pairs, arguments: symbol);
+    final result = await _navigator.pushNamed(AppNavigator.pairs, arguments: symbol);
     return result as String?;
   }
 
   void showNewOrderScreen(String pair) {
-    _navigator.pushNamed(AppNavigator.newOrder);
+    _navigator.pushNamed(AppNavigator.newOrder, arguments: pair);
   }
 }

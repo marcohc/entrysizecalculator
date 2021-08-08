@@ -4,7 +4,7 @@ import 'package:tilda/pairs/pairs_bloc.dart';
 
 class PairsScreen extends StatefulWidget {
   PairsScreen({Key? key, required this.symbol}) : super(key: key);
-  String symbol;
+  final String symbol;
 
   @override
   _PairsScreenState createState() => _PairsScreenState();
