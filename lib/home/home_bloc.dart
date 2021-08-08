@@ -77,7 +77,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } else if (event is OnSettingsClickEvent) {
       _navigator.showSettingsScreen();
     } else if (event is OnBaseCurrencyPairClick) {
-      _navigator.showBalancesScreen();
+      final symbol = await _navigator.showBalancesScreen();
+      if (symbol != null) {
+        final pair = await _navigator.showPairsScreen(symbol);
+        // await _navigator.showNewOrderScreen(pair);
+      }
     } else if (event is GetBalances) {
       await GetIt.instance.get<BinanceApi>().getAllOrders(symbol: 'ETHUSDT');
     } else if (event is PlaceTestOrder) {

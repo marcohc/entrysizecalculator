@@ -4,6 +4,8 @@ class AppNavigator {
   static const String home = '/';
   static const String settings = '/settings';
   static const String balances = '/balances';
+  static const String pairs = '/pairs';
+  static const String newOrder = '/newOrder';
 
   final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -19,7 +21,14 @@ class AppNavigator {
     _navigator.pushNamed(AppNavigator.settings);
   }
 
-  void showBalancesScreen() {
-    _navigator.pushNamed(AppNavigator.balances);
+  Future<String?> showBalancesScreen() async => (await _navigator.pushNamed(AppNavigator.balances)) as String?;
+
+  Future<String?> showPairsScreen(String symbol) async {
+    var result = await _navigator.pushNamed(AppNavigator.pairs, arguments: symbol);
+    return result as String?;
+  }
+
+  void showNewOrderScreen(String pair) {
+    _navigator.pushNamed(AppNavigator.newOrder);
   }
 }

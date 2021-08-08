@@ -3,7 +3,6 @@ import 'package:binance_api/model/account_info.dart';
 import "package:bloc/bloc.dart";
 import 'package:get_it/get_it.dart';
 import 'package:tilda/common/app_navigator.dart';
-import 'package:either_option/either_option.dart';
 
 class BalancesState {
   BalancesState({this.loading = true, this.error = true, this.items});
@@ -73,7 +72,7 @@ class BalancesBloc extends Bloc<BalancesEvent, BalancesState> {
         emit(state.copyWith(loading: false, items: items));
       });
     } else if (event is OnItemClickEvent) {
-      _navigator.pop(event.item);
+      _navigator.pop(event.item.name);
     } else if (event is OnPullToRefreshEvent) {
       // TODO: Call repository to fetch data
     }
