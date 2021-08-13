@@ -21,19 +21,30 @@ class _PairsScreenState extends State<PairsScreen> {
       ),
       body: BlocBuilder<PairsBloc, PairsState>(
         bloc: _bloc,
-        builder: (context, state) => Center(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: state.items?.length ?? 0,
-            itemBuilder: (context, index) => state.items != null
-                ? OutlinedButton(
-                    child: Text(state.items![index]),
-                    onPressed: () => _bloc.add(
-                      OnItemClickEvent(state.items![index]),
-                    ),
-                  )
-                : Container(),
-          ),
+        builder: (context, state) => Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: Center(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: state.items?.length ?? 0,
+                  itemBuilder: (context, index) => state.items != null
+                      ? OutlinedButton(
+                          child: Text(state.items![index]),
+                          onPressed: () => _bloc.add(
+                            OnItemClickEvent(state.items![index]),
+                          ),
+                        )
+                      : Container(),
+                ),
+              ),
+            ),
+            RaisedButton(
+              onPressed: _bloc.reload,
+              child: Text('Reload'),
+            ),
+          ],
         ),
       ),
     );

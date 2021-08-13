@@ -4,6 +4,7 @@ import 'package:binance_api/api_utils.dart';
 import 'package:binance_api/app_prefs.dart';
 import 'package:binance_api/model/account_info.dart';
 import 'package:binance_api/model/error.dart';
+import 'package:binance_api/model/exchange_info.dart';
 import 'package:binance_api/model/order.dart';
 import 'package:binance_api/model/place_order.dart';
 import 'package:binance_api/model/snapshot.dart';
@@ -18,6 +19,7 @@ const _baseUrl = 'https://api.binance.com';
 const _endpointStatus = '/sapi/v1/system/status';
 const _serverTime = '/api/v3/time';
 const _avgPrice = '/api/v3/avgPrice';
+const _exchangeInfo = '/api/v3/exchangeInfo';
 
 // Sign endpoints
 const _accountSnapshot = '/sapi/v1/accountSnapshot';
@@ -55,6 +57,16 @@ class BinanceApi {
     return response as Map<String, dynamic>;
   }
 
+  Future<Either<ErrorModel, ExchangeInfo>> exchangeInfo() async {
+    return await executeSafely(
+      'exchangeInfo',
+      _getCall(_exchangeInfo),
+      (result) => ExchangeInfo.fromJson(result as Map<String, dynamic>),
+    );
+    // final response = await _getCall(_exchangeInfo);
+    // return response as Map<String, dynamic>;
+  }
+
 //endregion
 
 //region Sign endpoints
@@ -87,14 +99,14 @@ class BinanceApi {
       );
 
   Future<Either<ErrorModel, List<Order>>> getOpenOrders({String symbol = 'ETHBTC'}) => executeSafely<Map<String, dynamic>, List<Order>>(
-    'getOpenOrders',
-    _executeTimeAdjusted(_openOrders, query: {'symbol': symbol}),
+        'getOpenOrders',
+        _executeTimeAdjusted(_openOrders, query: {'symbol': symbol}),
         (result) {
-      final list = result as List<Map<String, dynamic>>;
-      final mapped = list.map((element) => Order.fromJson(element));
-      return mapped.toList();
-    },
-  );
+          final list = result as List<Map<String, dynamic>>;
+          final mapped = list.map((element) => Order.fromJson(element));
+          return mapped.toList();
+        },
+      );
 
   // TODO: Implement for CurrencyPairs screen
   Future<Either<ErrorModel, List<dynamic>>> getAllPairs({String symbol = 'BTC'}) async => Right(<dynamic>[]);
