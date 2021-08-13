@@ -11,10 +11,9 @@ class BalancesState {
   final bool error;
   final List<BalancesItem>? items;
 
-  BalancesState copyWith(
-          {bool loading = true,
-          bool error = true,
-          List<BalancesItem>? items}) =>
+  BalancesState copyWith({bool loading = true,
+    bool error = true,
+    List<BalancesItem>? items}) =>
       BalancesState(
         loading: loading,
         error: error,
@@ -49,39 +48,34 @@ class BalancesBloc extends Bloc<BalancesEvent, BalancesState> {
   @override
   Stream<BalancesState> mapEventToState(BalancesEvent event) async* {
     if (event is InitEvent) {
-      emit(state.copyWith(loading: true));
-      final result = await _binanceApi.getAccountInfo();
-      // final result = Right(AccountInfo(
-      //     makerCommission: 0,
-      //     takerCommission: 0,
-      //     buyerCommission: 0,
-      //     sellerCommission: 0,
-      //     canTrade: true,
-      //     canWithdraw: true,
-      //     canDeposit: true,
-      //     updateTime: 0,
-      //     accountType: "",
-      //     balances: [Balance(asset: "ETH", free: "0.085", locked: "0.005")]));
-      result.fold((error) {
-        emit(state.copyWith(loading: false, error: true));
-      }, (accountInfo) {
-        final items = accountInfo.balances
-            .map((balance) =>
-                BalancesItem(balance.asset, balance.total.toString()))
-            .toList();
-        emit(state.copyWith(loading: false, items: items));
-      });
+      await fetchData();
     } else if (event is OnItemClickEvent) {
       _navigator.pop(event.item.name);
     } else if (event is OnPullToRefreshEvent) {
-      // TODO: Call repository to fetch data
+      await fetchData();
     }
+  }
+
+  Future<void> fetchData() async {
+    emit(state.copyWith(loading: true));
+    final result = await _binanceApi.getAccountInfo();
+    result.fold((error) {
+      emit(state.copyWith(loading: false, error: true));
+    }, (accountInfo) {
+      final items = accountInfo.balances
+          .map((balance) =>
+          BalancesItem(balance.asset, balance.total))
+          .where((element) => element.balance > 0.0)
+          .toList();
+      items.sort((a, b) => b.balance.compareTo(a.balance));
+      emit(state.copyWith(loading: false, items: items));
+    });
   }
 }
 
 class BalancesItem {
   final String name;
-  final String balance;
+  final double balance;
 
   BalancesItem(this.name, this.balance);
 }

@@ -56,8 +56,12 @@ class _BalancesScreenState extends State<BalancesScreen> {
                                       padding: const EdgeInsets.all(16.0),
                                       child: Row(
                                         children: [
-                                          Expanded(child: Text(item.name)),
-                                          Text(item.balance)
+                                          Expanded(
+                                              child: Text(item.name,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline6)),
+                                          Text(item.balance.toString())
                                         ],
                                       ),
                                     ),
